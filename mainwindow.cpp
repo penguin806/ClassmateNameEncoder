@@ -1,6 +1,8 @@
 ﻿#include "mainwindow.h"
 #include <QDebug>
 #include <QRandomGenerator>
+#include <QRegularExpression>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QDialog(parent)
@@ -47,6 +49,7 @@ void MainWindow::OnEncodeButtonClicked()
         HexValueArray.append(*p & 0x0f);
         p++;
     }
+    qDebug() << HexValueArray;
 
     QString EncodedString;
     for(int i=0;i<HexValueArray.size();i++)
@@ -82,5 +85,40 @@ void MainWindow::OnEncodeButtonClicked()
 
 void MainWindow::OnDecodeButtonClicked()
 {
+    QString TextToBeDecode = this->TextBox->toPlainText();
+    QRegularExpression RegExp(u8"尹红爱|向健|童方超");
+    int SplitWordCount = TextToBeDecode.count(RegExp);
+    QStringList WordList = TextToBeDecode.split(RegExp,QString::SkipEmptyParts);
+    if(SplitWordCount != WordList.size())
+    {
+        QMessageBox::critical(this,"Error","Failed");
+        return;
+    }
 
+    QByteArray DecodedHexArray;
+    for(int i=0;i<WordList.size();i++)
+    {
+        int Index = MyClassmateCollectionA.indexOf(WordList.at(i));
+        if(Index == -1 || Index >= 21)
+        {
+            QMessageBox::critical(this,"Error","Failed");
+            return;
+        }else if(Index >= 17)
+        {
+            Index -= 17;
+        }
+        DecodedHexArray.append(Index);
+    }
+    qDebug() << DecodedHexArray;
+
+    QByteArray Utf8ByteArray;
+    for(int i=0;i<DecodedHexArray.size();i+=2)
+    {
+        char _8BitValue = ( (DecodedHexArray.at(i) << 4) & 0xff)
+                | (DecodedHexArray.at(i+1) & 0x0f);
+        Utf8ByteArray.append(_8BitValue);
+    }
+
+    QString DecodedText = QString::fromUtf8(Utf8ByteArray);
+    this->TextBox->setPlainText(DecodedText);
 }
