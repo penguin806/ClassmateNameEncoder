@@ -20,6 +20,9 @@ private:
     QPlainTextEdit *TextBox;
     QPushButton *EncodeButton, *DecodeButton;
     QVBoxLayout *VboxLayout;
+
+    QStringList MyClassmateCollectionA;
+    QStringList MyClassmateCollectionB;
 };
 
 #endif // MAINWINDOW_H
